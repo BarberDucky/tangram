@@ -1,0 +1,5 @@
+export * from './big-triangle'
+export * from './medium-triangle'
+export * from './parallelogram'
+export * from './small-triangle'
+export * from './square'
