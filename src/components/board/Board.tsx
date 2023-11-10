@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useLayoutEffect, useState} from 'react'
 import {
   BigTriangleShape,
   MediumTriangleShape,
@@ -20,7 +20,15 @@ function Board() {
     {name: 'rhombus', shape: ParallelogramShape().setPosition({x: 280 + 300, y: 140 + 300}).setRotation(90)},
   ])
 
-  const updateShape = (x: number, y: number, r: number, name: string) => {
+  useEffect(() => {
+    window.addEventListener('resize', recalculateForBounds)
+
+    return () => {
+      window.removeEventListener('resize', recalculateForBounds)
+    }
+  }, [shapes]);
+
+  const updateShape = (x: number, y: number, r: number, name: string, shouldSnap: boolean = true) => {
     setShapes((previousShapes) => {
       const newShapes = previousShapes
         .filter(shape => name != shape.name)
@@ -33,45 +41,69 @@ function Board() {
         oldShape!.shape.vertices,
         oldShape!.shape.triangles,
       )
+      if (shouldSnap) {
 
-      const epsilon = 30
-      let allDistances: Array<Distance> = []
-      newShapes.forEach(shape => {
-        const distancesFromNewShape = shape.shape.distancesToShape(newShape)
-        allDistances.push(...distancesFromNewShape)
-      })
 
-      const segmentDistances = allDistances
-        .filter(distance => distance.distanceToSegment <= epsilon)
-        .sort((a, b) => a.distanceToSegment - b.distanceToSegment)
+        const epsilon = 30
+        let allDistances: Array<Distance> = []
+        newShapes.forEach(shape => {
+          const distancesFromNewShape = shape.shape.distancesToShape(newShape)
+          allDistances.push(...distancesFromNewShape)
+        })
 
-      const vertexDistances = allDistances
-        .filter(distance => distance.distanceToVertex <= epsilon)
-        .sort((a, b) => a.distanceToVertex - b.distanceToVertex)
+        const segmentDistances = allDistances
+          .filter(distance => distance.distanceToSegment <= epsilon)
+          .sort((a, b) => a.distanceToSegment - b.distanceToSegment)
 
-      const shortestSegmentDistance = segmentDistances[0]
-      const shortestVertexDistance = vertexDistances[0]
+        const vertexDistances = allDistances
+          .filter(distance => distance.distanceToVertex <= epsilon)
+          .sort((a, b) => a.distanceToVertex - b.distanceToVertex)
 
-      let snap = {x: 0, y: 0}
-      if (shortestSegmentDistance != null && shortestVertexDistance != null) {
-        snap = shortestVertexDistance <= shortestSegmentDistance
-        ? shortestVertexDistance.vectorToVertex
-        : shortestSegmentDistance.vectorToSegment
-      } else if (shortestSegmentDistance == null && shortestVertexDistance != null) {
-        snap = shortestVertexDistance.vectorToVertex
-      } else if (shortestSegmentDistance != null && shortestVertexDistance == null) {
-        snap = shortestSegmentDistance.vectorToSegment
+        const shortestSegmentDistance = segmentDistances[0]
+        const shortestVertexDistance = vertexDistances[0]
+
+        let snap = {x: 0, y: 0}
+        if (shortestSegmentDistance != null && shortestVertexDistance != null) {
+          snap = shortestVertexDistance <= shortestSegmentDistance
+            ? shortestVertexDistance.vectorToVertex
+            : shortestSegmentDistance.vectorToSegment
+        } else if (shortestSegmentDistance == null && shortestVertexDistance != null) {
+          snap = shortestVertexDistance.vectorToVertex
+        } else if (shortestSegmentDistance != null && shortestVertexDistance == null) {
+          snap = shortestSegmentDistance.vectorToSegment
+        }
+
+        const newNewShape = new Shape(
+          {x: x + snap.x, y: y + snap.y},
+          r,
+          oldShape!.shape.anchor,
+          oldShape!.shape.vertices,
+          oldShape!.shape.triangles,
+        )
+
+        return [...newShapes, {name: oldShape!.name, shape: newNewShape}]
       }
+      return [...newShapes, {name: oldShape!.name, shape: newShape}]
+    })
+  }
 
-      const newNewShape = new Shape(
-        {x: x + snap.x, y: y + snap.y},
-        r,
-        oldShape!.shape.anchor,
-        oldShape!.shape.vertices,
-        oldShape!.shape.triangles,
+  function recalculateForBounds() {
+    const height = window.innerHeight
+    const width = window.innerWidth
+    shapes.forEach(shape => {
+      const vertices = shape.shape.getTransformedVertices()
+      let vectorToBounds = {x: 0, y: 0}
+      vertices.forEach(vertex => {
+        vectorToBounds.x = Math.max(vertex.x - width, vectorToBounds.x)
+        vectorToBounds.y = Math.max(vertex.y - height, vectorToBounds.y)
+      })
+      updateShape(
+        shape.shape.position.x - vectorToBounds.x,
+        shape.shape.position.y - vectorToBounds.y,
+        shape.shape.rotation,
+        shape.name,
+        false,
       )
-
-      return [...newShapes, {name: oldShape!.name, shape: newNewShape}]
     })
   }
 
