@@ -93,9 +93,7 @@ export class TransformationMatrix {
     const thisPoint = {x: this.values.c, y: this.values.f}
     const aPoint = {x: A.values.c, y: A.values.f}
 
-    const value = Math.abs(A.values.a - this.values.a) <= rotationEpsilon
+    return Math.abs(A.values.a - this.values.a) <= rotationEpsilon
       && Math.sqrt(distanceSquared(thisPoint,  aPoint)) <= positionEpsilon
-
-    return value
   }
 }

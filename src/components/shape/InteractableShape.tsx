@@ -8,7 +8,8 @@ interface ShapeProps {
   rotation: number
   anchor: Point,
   vertices: Array<Point>
-  updatePosition: (x: number, y: number, r: number) => void
+  updatePosition: (x: number, y: number) => void
+  updateRotation: (r: number) => void
 }
 
 function InteractableShape(props: ShapeProps) {
@@ -35,18 +36,14 @@ function InteractableShape(props: ShapeProps) {
       props.updatePosition(
         e.clientX - offset.x,
         e.clientY - offset.y,
-        props.rotation,
       )
     }
   }
 
   const wheelHandler = (e: React.WheelEvent) => {
-    props.updatePosition(
-      props.position.x,
-      props.position.y,
+    props.updateRotation(
       props.rotation + 0.05 * e.deltaY,
     )
-
   }
 
   const rectangle = getBoundingRectangle(props.vertices)

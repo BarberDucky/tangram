@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   BigTriangleShape,
   MediumTriangleShape,
@@ -36,7 +36,7 @@ function Board(props: BoardProps) {
     props.getShapes(shapes.map(shape => shape.shape))
   }, [shapes]);
 
-  const updateShape = (x: number, y: number, r: number, name: string, shouldSnap: boolean = true) => {
+  const updateShapePosition = (x: number, y: number, name: string, shouldSnap: boolean = true) => {
     setShapes((previousShapes) => {
       const newShapes = previousShapes
         .filter(shape => name != shape.name)
@@ -44,31 +44,29 @@ function Board(props: BoardProps) {
 
       let newShape = new Shape(
         {x, y},
-        r,
+        oldShape!.shape.rotation,
         oldShape!.shape.anchor,
         oldShape!.shape.vertices,
         oldShape!.shape.triangles,
       )
+
       if (shouldSnap) {
-
-
         const epsilon = 30
-        let allDistances: Array<Distance> = []
-        newShapes.forEach(shape => {
-          const distancesFromNewShape = shape.shape.distancesToShape(newShape)
-          allDistances.push(...distancesFromNewShape)
-        })
 
-        const segmentDistances = allDistances
+        const allDistances = newShapes.reduce((acc, curr) => [
+          ...acc,
+          ...curr.shape.distancesToShape(newShape)
+        ], [] as Array<Distance>)
+
+        const shortestSegmentDistance = allDistances
           .filter(distance => distance.distanceToSegment <= epsilon)
           .sort((a, b) => a.distanceToSegment - b.distanceToSegment)
+          .at(0)
 
-        const vertexDistances = allDistances
+        const shortestVertexDistance = allDistances
           .filter(distance => distance.distanceToVertex <= epsilon)
           .sort((a, b) => a.distanceToVertex - b.distanceToVertex)
-
-        const shortestSegmentDistance = segmentDistances[0]
-        const shortestVertexDistance = vertexDistances[0]
+          .at(0)
 
         let snap = {x: 0, y: 0}
         if (shortestSegmentDistance != null && shortestVertexDistance != null) {
@@ -81,16 +79,27 @@ function Board(props: BoardProps) {
           snap = shortestSegmentDistance.vectorToSegment
         }
 
-        const newNewShape = new Shape(
-          {x: x + snap.x, y: y + snap.y},
-          r,
-          oldShape!.shape.anchor,
-          oldShape!.shape.vertices,
-          oldShape!.shape.triangles,
-        )
-
-        return [...newShapes, {name: oldShape!.name, shape: newNewShape}]
+        newShape.setPosition({x: x + snap.x, y: y + snap.y})
       }
+
+      return [...newShapes, {name: oldShape!.name, shape: newShape}]
+    })
+  }
+
+  const updateShapeRotation = (r: number, name: string, shouldSnap: boolean = true) => {
+    setShapes((previousShapes) => {
+      const newShapes = previousShapes
+        .filter(shape => name != shape.name)
+      let oldShape = previousShapes.find(shape => shape.name == name)
+
+      let newShape = new Shape(
+        oldShape!.shape.position,
+        r,
+        oldShape!.shape.anchor,
+        oldShape!.shape.vertices,
+        oldShape!.shape.triangles,
+      )
+
       return [...newShapes, {name: oldShape!.name, shape: newShape}]
     })
   }
@@ -105,10 +114,9 @@ function Board(props: BoardProps) {
         vectorToBounds.x = Math.max(vertex.x - width, vectorToBounds.x)
         vectorToBounds.y = Math.max(vertex.y - height, vectorToBounds.y)
       })
-      updateShape(
+      updateShapePosition(
         shape.shape.position.x - vectorToBounds.x,
         shape.shape.position.y - vectorToBounds.y,
-        shape.shape.rotation,
         shape.name,
         false,
       )
@@ -122,7 +130,8 @@ function Board(props: BoardProps) {
       rotation={shape.shape.rotation}
       anchor={shape.shape.anchor}
       vertices={shape.shape.vertices}
-      updatePosition={(x: number, y: number, r: number) => updateShape(x, y, r, shape.name)}
+      updatePosition={(x: number, y: number) => updateShapePosition(x, y, shape.name)}
+      updateRotation={(r: number) => updateShapeRotation(r, shape.name)}
     ></InteractableShape>
   })
 
