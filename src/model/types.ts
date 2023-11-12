@@ -1,6 +1,6 @@
 import {TransformationMatrix} from "./transformations/transformation";
 import {closestPointOnSegment, distanceSquared, distanceToSegment} from "./utils/math-utils";
-import {getBoundingRectangle} from "./utils/shape-utils";
+import {getBoundingRectangle, getBoundingRectangleShapes} from "./utils/shape-utils";
 
 export interface Point {
   x: number
@@ -132,9 +132,38 @@ export class Figure {
   }
 
   public getTransformedTriangles(): Array<TransformationMatrix> {
-    return this.shapes.reduce((acc, shape) => {
+    return this.shapesToTriangles(this.shapes)
+  }
+
+  public isSame(shapes: Array<Shape>): boolean {
+    const shapeRectangle = getBoundingRectangleShapes(shapes)
+
+    const figureTriangles = this.getTransformedTriangles()
+    const shapeTriangles = this.shapesToTriangles(shapes)
+      .map(triangle => triangle.translate(-shapeRectangle.x, -shapeRectangle.y))
+
+    if (figureTriangles.length != shapeTriangles.length) {
+      return false
+    }
+
+    for (let figureTriangle of figureTriangles) {
+      let foundPair = false
+      for (let shapeTriangle of shapeTriangles) {
+        if (shapeTriangle.isClose(figureTriangle, 5, 0.05)) {
+          foundPair = true
+        }
+      }
+      if (!foundPair) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  private shapesToTriangles(shapes: Array<Shape>): Array<TransformationMatrix> {
+    return shapes.reduce((acc, shape) => {
       return [...acc, ...shape.getTransformedTriangles()]
     }, [] as Array<TransformationMatrix>)
   }
-
 }

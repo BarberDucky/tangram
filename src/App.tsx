@@ -4,6 +4,7 @@ import DrawnFigure from "./components/figure/DrawnFigure";
 import {SquareFigure} from "./model/figures";
 import Board from "./components/board/Board";
 import Title from "./components/title/Title";
+import {Shape} from "./model/types";
 
 interface State {
   titleProgress: number,
@@ -44,6 +45,8 @@ function App() {
     figureProgress: 0,
   } as State)
 
+
+
   useEffect(() => {
 
     const callback = (t: number) => {
@@ -66,6 +69,10 @@ function App() {
 
   const figure = SquareFigure()
 
+  function getShapes(shapes: Array<Shape>) {
+    console.log(figure.isSame(shapes))
+  }
+
   return (
     <div className="app">
       <Title progress={gameState.titleProgress}></Title>
@@ -77,7 +84,7 @@ function App() {
         ></DrawnFigure>
       </div>
       <div style={{opacity: 1 - Math.pow(1 - gameState.boardProgress, 5)}}>
-        <Board></Board>
+        <Board getShapes={getShapes}></Board>
       </div>
     </div>
   )

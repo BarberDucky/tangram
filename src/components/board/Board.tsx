@@ -9,7 +9,11 @@ import {
 import {Distance, Shape} from "../../model/types";
 import InteractableShape from "../shape/InteractableShape";
 
-function Board() {
+interface BoardProps {
+  getShapes: (shapes: Array<Shape>) => void
+}
+
+function Board(props: BoardProps) {
   const [shapes, setShapes] = useState([
     {name: 'small1', shape: SmallTriangleShape().setPosition({x: 322 + 300, y: 181 + 300}).setRotation(315)},
     {name: 'small2', shape: SmallTriangleShape().setPosition({x: 40 + 300, y: 463 + 300}).setRotation(45)},
@@ -26,6 +30,10 @@ function Board() {
     return () => {
       window.removeEventListener('resize', recalculateForBounds)
     }
+  }, [shapes]);
+
+  useEffect(() => {
+    props.getShapes(shapes.map(shape => shape.shape))
   }, [shapes]);
 
   const updateShape = (x: number, y: number, r: number, name: string, shouldSnap: boolean = true) => {

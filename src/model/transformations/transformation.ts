@@ -1,4 +1,5 @@
 import {Point} from "../types";
+import {distanceSquared} from "../utils/math-utils";
 
 export class TransformationMatrix {
 
@@ -88,4 +89,13 @@ export class TransformationMatrix {
     }
   }
 
+  public isClose(A: TransformationMatrix, positionEpsilon: number, rotationEpsilon: number): boolean {
+    const thisPoint = {x: this.values.c, y: this.values.f}
+    const aPoint = {x: A.values.c, y: A.values.f}
+
+    const value = Math.abs(A.values.a - this.values.a) <= rotationEpsilon
+      && Math.sqrt(distanceSquared(thisPoint,  aPoint)) <= positionEpsilon
+
+    return value
+  }
 }
