@@ -139,9 +139,17 @@ function Board(props: BoardProps) {
   })
 
   return (
-    <div>
+    <svg
+      width='100vw'
+      height='100vh'
+      style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+      }}
+    >
       {renderedShapes}
-    </div>
+    </svg>
   )
 }
 

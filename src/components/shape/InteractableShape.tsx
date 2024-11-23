@@ -55,38 +55,28 @@ function InteractableShape(props: ShapeProps) {
   const originalPointsString = generatePolygonString(props.vertices)
 
   return (
-    <svg
+    <polygon
+      className="interactable-shape"
       style={{
-        position: "absolute",
-        left: props.position.x,
-        top: props.position.y,
-        transform: `rotate(${props.rotation}deg)`,
+        strokeWidth: SHAPE_BORDER_WIDTH,
         zIndex: isDragging ? 5 : 1,
-        pointerEvents: "none",
+        pointerEvents: "all",
       }}
-      height={rectangle.height}
-      width={rectangle.width}
-    >
-      <polygon
-        className="interactable-shape"
-        style={{
-          strokeWidth: SHAPE_BORDER_WIDTH,
-        }}
-        pointerEvents={'all'}
-        onMouseDown={(e) => {
-          setOffset((prevState) => {
-            return {
-              x: e.clientX - props.position.x,
-              y: e.clientY - props.position.y,
-            }
-          })
-          setIsDragging(true)
-        }}
-        onMouseUp={() => setIsDragging(false)}
-        onWheel={(e) => wheelHandler(e)}
-        points={pointsString}
-      />
-    </svg>
+      transform={`rotate(${props.rotation} ${props.position.x + rectangle.width / 2} ${props.position.y + rectangle.height / 2}) translate(${props.position.x} ${props.position.y})`}
+      pointerEvents={'all'}
+      onMouseDown={(e) => {
+        setOffset((prevState) => {
+          return {
+            x: e.clientX - props.position.x,
+            y: e.clientY - props.position.y,
+          }
+        })
+        setIsDragging(true)
+      }}
+      onMouseUp={() => setIsDragging(false)}
+      onWheel={(e) => wheelHandler(e)}
+      points={pointsString}
+    />
   )
 }
 

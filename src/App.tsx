@@ -76,15 +76,15 @@ function App() {
   return (
     <div className="app">
       <Title progress={gameState.titleProgress}></Title>
-      <div style={{opacity: 1 - Math.pow(1 - gameState.figureProgress, 5)}}>
+      <div style={{ opacity: 1 - Math.pow(1 - gameState.boardProgress, 5) }}>
+        <Board getShapes={getShapes}></Board>
+      </div>
+      <div style={{ opacity: 1 - Math.pow(1 - gameState.figureProgress, 5) }}>
         <DrawnFigure
           position={getFigurePosition(gameState.figureProgress)}
           scale={getFigureScale(gameState.figureProgress)}
           polygons={figure.polygons}
         ></DrawnFigure>
-      </div>
-      <div style={{opacity: 1 - Math.pow(1 - gameState.boardProgress, 5)}}>
-        <Board getShapes={getShapes}></Board>
       </div>
     </div>
   )
