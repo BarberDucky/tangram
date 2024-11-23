@@ -47,6 +47,7 @@ export class Shape {
     public position: Point,
     public rotation: number,
     public anchor: Point,
+    public adaptVerticesForBorder: (borderWidth: number) => Array<Point>,
     public readonly vertices: Array<Point>,
     public readonly triangles: Array<Triangle>,
   ) {

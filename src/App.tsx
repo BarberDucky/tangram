@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import DrawnFigure from "./components/figure/DrawnFigure";
-import {SquareFigure} from "./model/figures";
+import { SquareFigure } from "./model/figures";
 import Board from "./components/board/Board";
 import Title from "./components/title/Title";
-import {Shape} from "./model/types";
+import { Shape } from "./model/types";
 
 interface State {
   titleProgress: number,
@@ -19,9 +19,9 @@ interface Action {
 }
 
 const actions: Array<Action> = [
-  {perform: t => ({titleProgress: t}), when: 0, duration: 2000},
-  {perform: t => ({figureProgress: t}), when: 2000, duration: 2000},
-  {perform: t => ({boardProgress: t}), when: 4000, duration: 1000},
+  // {perform: t => ({titleProgress: t}), when: 0, duration: 2000},
+  // {perform: t => ({figureProgress: t}), when: 2000, duration: 2000},
+  // {perform: t => ({boardProgress: t}), when: 4000, duration: 1000},
 ]
 
 function getStateFromActions(actions: Array<Action>, t: number) {
@@ -40,32 +40,32 @@ function getStateFromActions(actions: Array<Action>, t: number) {
 function App() {
 
   const [gameState, setGameState] = useState({
-    titleProgress: 0,
-    boardProgress: 0,
-    figureProgress: 0,
+    titleProgress: 1,
+    boardProgress: 1,
+    figureProgress: 1,
   } as State)
 
 
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    const callback = (t: number) => {
+  //   const callback = (t: number) => {
 
-      setGameState((prevState) => {
-        return {
-          ...prevState,
-          ...getStateFromActions(actions, t)
-        }
-      })
+  //     setGameState((prevState) => {
+  //       return {
+  //         ...prevState,
+  //         ...getStateFromActions(actions, t)
+  //       }
+  //     })
 
-      return requestAnimationFrame(callback)
-    }
+  //     return requestAnimationFrame(callback)
+  //   }
 
-    const id = requestAnimationFrame(callback)
+  //   const id = requestAnimationFrame(callback)
 
-    return () => cancelAnimationFrame(id)
+  //   return () => cancelAnimationFrame(id)
 
-  }, []);
+  // }, []);
 
   const figure = SquareFigure()
 

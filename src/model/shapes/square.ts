@@ -1,4 +1,4 @@
-import {Shape, Triangle} from "../types";
+import { Shape, Triangle } from "../types";
 
 const SQUARE = () => {
   const t1 = new Triangle()
@@ -11,15 +11,25 @@ const SQUARE = () => {
 
 export const SquareShape = () => {
   return new Shape(
-    {x: 0, y: 0},
+    { x: 0, y: 0 },
     0,
-    {x: 0, y: 0},
+    { x: 0, y: 0 },
+    getBorderAdaptedSquare,
     [
-      {x: 0, y: 0},
-      {x: 200, y: 0},
-      {x: 200, y: 200},
-      {x: 0, y: 200},
+      { x: 0, y: 0 },
+      { x: 200, y: 0 },
+      { x: 200, y: 200 },
+      { x: 0, y: 200 },
     ],
     SQUARE(),
   )
+}
+
+function getBorderAdaptedSquare(borderWidth: number) {
+  return [
+    { x: 0 + borderWidth / 2, y: 0 + borderWidth / 2 },
+    { x: 200 - borderWidth / 2, y: 0 + borderWidth / 2 },
+    { x: 200 - borderWidth / 2, y: 200 - borderWidth / 2 },
+    { x: 0 + borderWidth / 2, y: 200 - borderWidth / 2 },
+  ]
 }

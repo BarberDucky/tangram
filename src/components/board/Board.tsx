@@ -46,6 +46,7 @@ function Board(props: BoardProps) {
         {x, y},
         oldShape!.shape.rotation,
         oldShape!.shape.anchor,
+        oldShape!.shape.adaptVerticesForBorder,
         oldShape!.shape.vertices,
         oldShape!.shape.triangles,
       )
@@ -96,6 +97,7 @@ function Board(props: BoardProps) {
         oldShape!.shape.position,
         r,
         oldShape!.shape.anchor,
+        oldShape!.shape.adaptVerticesForBorder,
         oldShape!.shape.vertices,
         oldShape!.shape.triangles,
       )
@@ -130,6 +132,7 @@ function Board(props: BoardProps) {
       rotation={shape.shape.rotation}
       anchor={shape.shape.anchor}
       vertices={shape.shape.vertices}
+      adaptVerticesForBorder={shape.shape.adaptVerticesForBorder}
       updatePosition={(x: number, y: number) => updateShapePosition(x, y, shape.name)}
       updateRotation={(r: number) => updateShapeRotation(r, shape.name)}
     ></InteractableShape>

@@ -1,13 +1,16 @@
-import React, {useEffect, useState} from 'react'
-import {Point} from "../../model/types";
+import React, { useEffect, useState } from 'react'
+import { Point } from "../../model/types";
 import './InteractableShape.css'
-import {generatePolygonString, getBoundingRectangle} from "../../model/utils/shape-utils";
+import { generatePolygonString, getBoundingRectangle } from "../../model/utils/shape-utils";
+
+const SHAPE_BORDER_WIDTH = 5
 
 interface ShapeProps {
   position: Point
   rotation: number
   anchor: Point,
   vertices: Array<Point>
+  adaptVerticesForBorder: (borderWidth: number) => Array<Point>
   updatePosition: (x: number, y: number) => void
   updateRotation: (r: number) => void
 }
@@ -15,7 +18,7 @@ interface ShapeProps {
 function InteractableShape(props: ShapeProps) {
 
   const [isDragging, setIsDragging] = useState(false)
-  const [offset, setOffset] = useState({x: 0, y: 0})
+  const [offset, setOffset] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     if (isDragging) {
@@ -47,7 +50,9 @@ function InteractableShape(props: ShapeProps) {
   }
 
   const rectangle = getBoundingRectangle(props.vertices)
-  const pointsString = generatePolygonString(props.vertices)
+  const borderAdjustedPoints = props.adaptVerticesForBorder(SHAPE_BORDER_WIDTH / 1)
+  const pointsString = generatePolygonString(borderAdjustedPoints)
+  const originalPointsString = generatePolygonString(props.vertices)
 
   return (
     <svg
@@ -61,8 +66,12 @@ function InteractableShape(props: ShapeProps) {
       }}
       height={rectangle.height}
       width={rectangle.width}
-      className="interactable-shape">
+    >
       <polygon
+        className="interactable-shape"
+        style={{
+          strokeWidth: SHAPE_BORDER_WIDTH,
+        }}
         pointerEvents={'all'}
         onMouseDown={(e) => {
           setOffset((prevState) => {
@@ -75,7 +84,8 @@ function InteractableShape(props: ShapeProps) {
         }}
         onMouseUp={() => setIsDragging(false)}
         onWheel={(e) => wheelHandler(e)}
-        points={pointsString}/>
+        points={pointsString}
+      />
     </svg>
   )
 }

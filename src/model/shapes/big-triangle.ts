@@ -1,4 +1,4 @@
-import {Shape, Triangle} from "../types";
+import { Shape, Triangle } from "../types";
 
 const BIG_TRIANGLE = () => {
   const t1 = new Triangle()
@@ -37,14 +37,25 @@ const BIG_TRIANGLE = () => {
 
 export const BigTriangleShape = () => {
   return new Shape(
-    {x: 0, y: 0},
+    { x: 0, y: 0 },
     0,
-    {x: 0, y: 0},
+    { x: 0, y: 0 },
+    getBorderAdaptedBigTriangle,
     [
-      {x: 0, y: 0},
-      {x: 400, y: 0},
-      {x: 0, y: 400},
+      { x: 0, y: 0 },
+      { x: 400, y: 0 },
+      { x: 0, y: 400 },
     ],
     BIG_TRIANGLE(),
   )
+}
+
+function getBorderAdaptedBigTriangle(borderWidth: number) {
+  const miterLength = borderWidth / 2 / Math.sin(Math.PI / 4)
+
+  return [
+    { x: 0 + borderWidth / 2, y: 0 + borderWidth / 2 },
+    { x: 400 - borderWidth / 2 - miterLength, y: 0 + borderWidth / 2 },
+    { x: 0 + borderWidth / 2, y: 400 - borderWidth / 2 - miterLength },
+  ]
 }
