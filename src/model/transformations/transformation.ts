@@ -23,9 +23,11 @@ export class TransformationMatrix {
     return this.multiply(T)
   }
 
-  public rotate(rad: number): this {
-    const sin = Math.sin(rad)
-    const cos = Math.cos(rad)
+  public rotate(rad: number, log: boolean = true): this {
+    const normalizedRad = rad % (2 * Math.PI)
+
+    const sin = Math.sin(normalizedRad)
+    const cos = Math.cos(normalizedRad)
     const R = new TransformationMatrix()
       .set(cos, -sin, 0, sin, cos, 0)
     return this.multiply(R)
@@ -94,6 +96,7 @@ export class TransformationMatrix {
     const aPoint = {x: A.values.c, y: A.values.f}
 
     return Math.abs(A.values.a - this.values.a) <= rotationEpsilon
+      && Math.abs(A.values.b - this.values.b) <= rotationEpsilon
       && Math.sqrt(distanceSquared(thisPoint,  aPoint)) <= positionEpsilon
   }
 }

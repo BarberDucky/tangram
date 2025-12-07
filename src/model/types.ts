@@ -33,7 +33,7 @@ export class Triangle {
   public getFinalTransformation(): TransformationMatrix {
     return new TransformationMatrix()
       .setFromMatrix(this.transformation)
-      .rotate(this.rotation)
+      .rotate(this.rotation * (Math.PI / 180))
       .translate(this.position.x, this.position.y)
   }
 
